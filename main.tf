@@ -52,9 +52,9 @@ resource "aws_iam_role" "s3-access-role" {
       {
         Effect = "Allow"
         Principal = {
-          Service = "s3.amazonaws.com"
+          Service = "ec2.amazonaws.com"
         }
-        Action = "s3:*"
+        Action = "sts:AssumeRole"
       }
     ]
   })
@@ -85,16 +85,38 @@ resource "aws_iam_instance_profile" "ec2-instance-profile" {
   name = "ec2-instance-profile"
   role = aws_iam_role.s3-access-role.name
 }
+
+resource "aws_security_group" "ec2_sg" {
+
+  name = "project19-sg"
+
+
+  egress {
+
+    from_port = 0
+
+    to_port = 0
+
+    protocol = "-1"
+
+    cidr_blocks = ["0.0.0.0/0"]
+
+  }
+
+}
+
 resource "aws_instance" "ec2-instance" {
   ami                  = data.aws_ami.ec2-ami.id
   instance_type        = "t4g.small"
   depends_on           = [aws_iam_instance_profile.ec2-instance-profile]
   iam_instance_profile = aws_iam_instance_profile.ec2-instance-profile.name
+  vpc_security_group_ids = [aws_security_group.ec2_sg.id]
+  user_data = file("userdata.sh")
   tags = {
     name = "ec2-project-19"
   }
   root_block_device {
     volume_size = 15
-    volume_type = "gp2"
+    volume_type = "gp3"
   }
 }
