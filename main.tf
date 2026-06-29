@@ -106,12 +106,12 @@ resource "aws_security_group" "ec2_sg" {
 }
 
 resource "aws_instance" "ec2-instance" {
-  ami                  = data.aws_ami.ec2-ami.id
-  instance_type        = "t4g.small"
-  depends_on           = [aws_iam_instance_profile.ec2-instance-profile]
-  iam_instance_profile = aws_iam_instance_profile.ec2-instance-profile.name
+  ami                    = data.aws_ami.ec2-ami.id
+  instance_type          = "t4g.small"
+  depends_on             = [aws_iam_instance_profile.ec2-instance-profile]
+  iam_instance_profile   = aws_iam_instance_profile.ec2-instance-profile.name
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
-  user_data = file("userdata.sh")
+  user_data              = file("userdata.sh")
   tags = {
     name = "ec2-project-19"
   }
